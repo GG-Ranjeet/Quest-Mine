@@ -1,4 +1,4 @@
-import { rarityClass, rarityDot, type Rarity } from "../../lib/gameData";
+import { rarityClass, rarityDot, type Rarity } from "../../../lib/gameData";
 
 export function RarityBadge({ rarity }: { rarity: Rarity }) {
   return (
