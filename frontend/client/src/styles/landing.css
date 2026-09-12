@@ -1,0 +1,264 @@
+/* Landing */
+.landing {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: #0a1116;
+}
+.landing-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(7, 12, 16, 0.89) 0%,
+      rgba(7, 12, 16, 0.58) 40%,
+      rgba(7, 12, 16, 0.12) 100%
+    ),
+    url("/manus-storage/questmine-cave_46c2da8b.png");
+  background-size: cover;
+  background-position: center;
+  filter: saturate(0.82);
+}
+.landing-noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.16;
+  pointer-events: none;
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.16) 0.5px,
+    transparent 0.5px
+  );
+  background-size: 5px 5px;
+  mix-blend-mode: overlay;
+}
+.landing-nav {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 6vw;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.landing-links {
+  display: flex;
+  gap: 32px;
+  margin-left: auto;
+  margin-right: 38px;
+  color: #b7bab1;
+  font-size: 12px;
+}
+.landing-links a:hover {
+  color: #efd19a;
+}
+.landing-hero {
+  position: relative;
+  z-index: 1;
+  min-height: 585px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 66px 11vw 60px 12vw;
+}
+.hero-copy {
+  max-width: 570px;
+  position: relative;
+  z-index: 3;
+}
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #c2b8a5;
+  font: 11px "DM Mono";
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.kicker-dot,
+.pulse {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow:
+    0 0 0 4px rgba(101, 199, 189, 0.1),
+    0 0 14px var(--teal);
+}
+.hero-copy h1 {
+  font: 700 clamp(47px, 6vw, 83px)/0.96 "Space Grotesk";
+  letter-spacing: -0.065em;
+  margin: 28px 0 24px;
+  color: #f5eee5;
+}
+.hero-copy h1 em,
+.landing-feature em {
+  font-style: normal;
+  color: #d4a85c;
+}
+.hero-copy p {
+  max-width: 470px;
+  margin: 0;
+  color: #b0b5ae;
+  font-size: 15px;
+  line-height: 1.75;
+}
+.hero-actions {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  margin-top: 34px;
+}
+.quiet-link {
+  font-size: 12px;
+  color: #d3cbc0;
+}
+.quiet-link span {
+  margin-left: 9px;
+  color: var(--gold);
+}
+.hero-trust {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 48px;
+  color: #79858a;
+  font-size: 11px;
+}
+.avatar-stack {
+  display: flex;
+}
+.avatar-stack span {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  margin-left: -6px;
+  border: 2px solid #161c20;
+  display: grid;
+  place-items: center;
+  background: #313b3a;
+  color: #d2b16f;
+  font-size: 10px;
+}
+.avatar-stack span:first-child {
+  margin-left: 0;
+  background: #735c4a;
+}
+.avatar-stack span:nth-child(2) {
+  background: #416b6d;
+}
+.avatar-stack span:nth-child(3) {
+  background: #554878;
+}
+.avatar-stack span:last-child {
+  background: #1f282b;
+  color: #a3ada8;
+}
+.hero-character {
+  width: 425px;
+  height: 560px;
+  position: relative;
+  margin-right: 3vw;
+  align-self: flex-end;
+}
+.hero-character img {
+  position: absolute;
+  width: 515px;
+  max-width: none;
+  right: -68px;
+  bottom: -60px;
+  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.7));
+  animation: float 5s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+.character-aura {
+  position: absolute;
+  inset: 20% 0 10%;
+  background: radial-gradient(
+    ellipse,
+    rgba(56, 150, 157, 0.38),
+    transparent 62%
+  );
+  filter: blur(30px);
+}
+.character-tag {
+  position: absolute;
+  bottom: 0;
+  left: 4px;
+  padding: 10px 13px;
+  background: rgba(16, 24, 28, 0.84);
+  border: 1px solid rgba(124, 179, 169, 0.25);
+  font: 10px "DM Mono";
+  color: #bdc6bf;
+}
+.character-tag .pulse {
+  margin-right: 7px;
+  width: 5px;
+  height: 5px;
+}
+.character-tag strong {
+  color: #8e9a97;
+  margin: 0 5px;
+}
+.loop-strip {
+  position: relative;
+  z-index: 2;
+  margin: 0 6vw;
+  padding: 23px 30px;
+  display: flex;
+  align-items: center;
+  gap: 23px;
+  background: rgba(17, 24, 28, 0.82);
+  border: 1px solid rgba(219, 193, 149, 0.18);
+  backdrop-filter: blur(12px);
+}
+.loop-label {
+  color: #b78042;
+  font: 10px "DM Mono";
+  letter-spacing: 0.18em;
+  margin-right: 10px;
+}
+.loop-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 145px;
+}
+.loop-item span {
+  color: #c59351;
+  font: 10px "DM Mono";
+}
+.loop-item b {
+  font: 600 13px "Space Grotesk";
+}
+.loop-item small {
+  color: #77838a;
+  font-size: 10px;
+}
+.loop-arrow {
+  color: #647276;
+  font-size: 19px;
+}
+.landing-feature {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 50px;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 110px 30px 130px;
+}
+.landing-feature h2 {
+  margin: 9px 0;
+  font: 600 42px/0.98 "Space Grotesk";
+  letter-spacing: -0.05em;
+}
+.landing-feature p {
+  max-width: 390px;
+  color: #94a0a2;
+  font-size: 14px;
+  line-height: 1.8;
+  margin-top: 33px;
+}

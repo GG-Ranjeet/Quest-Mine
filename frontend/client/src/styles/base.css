@@ -1,0 +1,45 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+
+:root {
+  font-family: "Manrope", sans-serif;
+  color: #f3eadc;
+  background: #0c1115;
+  font-synthesis: none;
+  --bg: #0c1115;
+  --panel: #121a20;
+  --panel2: #172128;
+  --line: rgba(219, 193, 149, 0.17);
+  --muted: #82909a;
+  --gold: #d7a95e;
+  --cream: #f3eadc;
+  --teal: #65c7bd;
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--bg);
+  color: var(--cream);
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  border: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+}
