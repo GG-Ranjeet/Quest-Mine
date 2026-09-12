@@ -15,7 +15,7 @@
       rgba(7, 12, 16, 0.58) 40%,
       rgba(7, 12, 16, 0.12) 100%
     ),
-    url("/manus-storage/questmine-cave_46c2da8b.png");
+    url("/questmine-cave.png");
   background-size: cover;
   background-position: center;
   filter: saturate(0.82);

@@ -46,7 +46,7 @@ export function GameContent({
               <i />
             </div>
             <img
-              src="/manus-storage/questmine-mascot_0a10ca73.png"
+              src="/questmine-mascot.png"
               alt="Your character in Crystal Caverns"
             />
             <div className="character-name">

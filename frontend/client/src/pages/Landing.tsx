@@ -58,7 +58,7 @@ export function Landing() {
         <div className="hero-character">
           <div className="character-aura" />
           <img
-            src="/manus-storage/questmine-mascot_0a10ca73.png"
+            src="/questmine-mascot.png"
             alt="QuestMine adventurer"
           />
           <div className="character-tag">

@@ -280,7 +280,7 @@
   inset: 0;
   background-image:
     linear-gradient(90deg, rgba(6, 13, 16, 0.55), rgba(6, 13, 16, 0.1)),
-    url("/manus-storage/questmine-cave_46c2da8b.png");
+    url("/questmine-cave.png");
   background-size: cover;
   background-position: center right;
   filter: saturate(0.85) brightness(0.77);
