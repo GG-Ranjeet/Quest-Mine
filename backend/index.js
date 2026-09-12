@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const pool = require('./db');
+const pool = require('./src/db/db').default;
 
 const app = express();
 app.use(cors());
@@ -68,7 +68,7 @@ app.post('/api/quests/complete', async (req, res) => {
     `, [quest.xp, coinsReward, energyCost, dmg]);
 
     await client.query('COMMIT');
-    
+
     res.json({
       success: true,
       user: userResult.rows[0],
