@@ -1,0 +1,29 @@
+@baseUrl = http://localhost:5000/api
+
+### ---------------------------
+### 1. User Endpoints
+### ---------------------------
+
+### Get User Profile
+GET {{baseUrl}}/user
+Accept: application/json
+
+
+### ---------------------------
+### 2. Quest Endpoints
+### ---------------------------
+
+### Get All Active Quests
+GET {{baseUrl}}/quests
+Accept: application/json
+
+
+### Complete a Quest
+### Make sure to use a valid questId from the GET /quests response!
+POST {{baseUrl}}/quests/complete
+Content-Type: application/json
+
+{
+    "questId": "q1",
+    "damage": 50
+}
