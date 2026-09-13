@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 
-import userRoutes from './routes/user.routes.js';
+import userRoutes, { webhookRouter } from './routes/user.routes.js';
 import questRoutes from './routes/quest.routes.js';
 import craftingRoutes from './routes/crafting.routes.js';
 
@@ -9,6 +9,12 @@ const app = express();
 
 // Middleware
 app.use(cors());
+
+// ⚠️ Webhook route must be BEFORE express.json() to preserve the raw body
+// (svix needs the raw bytes to verify the signature)
+app.use('/api/webhooks', webhookRouter);
+
+// JSON body parsing for all other routes
 app.use(express.json());
 
 // Routes

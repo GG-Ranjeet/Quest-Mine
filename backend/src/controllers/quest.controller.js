@@ -1,23 +1,44 @@
 import { db } from '../db/db.js';
 import { quests, users } from '../db/schema.js';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
+
+// Helper: extract clerk_id from the JWT in Authorization header
+function getClerkIdFromReq(req) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  const token = authHeader.split(' ')[1];
+  try {
+    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+    return payload.sub || null;
+  } catch {
+    return null;
+  }
+}
+
+// Helper: get the DB user row from the Clerk JWT
+async function getUserFromReq(req, res) {
+  const clerkId = getClerkIdFromReq(req);
+  if (!clerkId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return null;
+  }
+  const result = await db.select().from(users).where(eq(users.clerkId, clerkId)).limit(1);
+  if (result.length === 0) {
+    res.status(404).json({ error: 'User not found' });
+    return null;
+  }
+  return result[0];
+}
 
 export const getQuests = async (req, res) => {
   try {
-    const allUsers = await db.select().from(users).limit(1);
-    if (allUsers.length === 0) return res.status(404).json({ error: 'User not found' });
-    const user = allUsers[0];
+    const user = await getUserFromReq(req, res);
+    if (!user) return;
 
     const activeQuests = await db.select()
       .from(quests)
-      .where(eq(quests.completed, false)); // We should technically filter by userId here too
-      
-    // In SQLite or Postgres, we can do: .where(and(eq(quests.completed, false), eq(quests.userId, user.id)))
-    // For now, filtering globally or if added to where clause:
-    // .where(and(eq(quests.completed, false), eq(quests.userId, user.id)))
-    // Since I didn't import `and` in this file yet, I'll just filter in memory or import `and`.
-    
-    // I will just return all active quests since seed data doesn't have userId right now.
+      .where(and(eq(quests.completed, false), eq(quests.userId, user.id)));
+
     res.json(activeQuests);
   } catch (error) {
     console.error('Error fetching quests:', error);
@@ -30,28 +51,25 @@ export const completeQuest = async (req, res) => {
   if (!questId) return res.status(400).json({ error: 'Quest ID required' });
 
   try {
-    // Start a transaction since we are updating multiple tables
+    const user = await getUserFromReq(req, res);
+    if (!user) return;
+
     const result = await db.transaction(async (tx) => {
-      // Get quest details
+      // Get quest details (must belong to this user)
       const questList = await tx.select()
         .from(quests)
-        .where(eq(quests.id, questId));
-        
+        .where(and(eq(quests.id, questId), eq(quests.userId, user.id)));
+
       if (questList.length === 0 || questList[0].completed) {
         throw new Error('Quest already completed or not found');
       }
-      
+
       const quest = questList[0];
 
-      // Update quest status
+      // Mark quest as completed
       await tx.update(quests)
         .set({ completed: true })
         .where(eq(quests.id, questId));
-
-      // Get user (assuming ID 1 for now)
-      const userList = await tx.select().from(users).limit(1);
-      if (userList.length === 0) throw new Error('User not found');
-      const user = userList[0];
 
       // Calculate rewards
       const coinsReward = Math.floor(Math.random() * 50) + 10;
@@ -83,26 +101,24 @@ export const completeQuest = async (req, res) => {
 
 export const createQuest = async (req, res) => {
   const { title, category, stat, difficulty, scheduledDate, isEveryday } = req.body;
-  
+
   if (!title) {
     return res.status(400).json({ error: 'Quest title is required' });
   }
 
   try {
-    const allUsers = await db.select().from(users).limit(1);
-    if (allUsers.length === 0) return res.status(404).json({ error: 'User not found' });
-    const user = allUsers[0];
+    const user = await getUserFromReq(req, res);
+    if (!user) return;
 
     // Calculate XP based on difficulty
     let baseXP = 10;
     if (difficulty === 'Medium') baseXP = 20;
     if (difficulty === 'Hard') baseXP = 30;
     if (difficulty === 'Epic') baseXP = 40;
-    
-    // Scale with user level (stat multiplier approximation)
+
+    // Scale with user level
     const calculatedXP = baseXP + (user.level * 2);
 
-    // If scheduled for today, grant +1 XP as requested
     const today = new Date().toISOString().split('T')[0];
     if (scheduledDate === today || isEveryday) {
       await db.update(users)
@@ -122,7 +138,7 @@ export const createQuest = async (req, res) => {
       scheduledDate: scheduledDate || today,
       isEveryday: isEveryday || false
     }).returning();
-    
+
     res.status(201).json(newQuest);
   } catch (error) {
     console.error('Error creating quest:', error);
@@ -132,12 +148,15 @@ export const createQuest = async (req, res) => {
 
 export const updateQuest = async (req, res) => {
   const { id } = req.params;
-  const updates = req.body; // { title, category, stat, etc. }
+  const updates = req.body;
 
   try {
+    const user = await getUserFromReq(req, res);
+    if (!user) return;
+
     const [updatedQuest] = await db.update(quests)
       .set(updates)
-      .where(eq(quests.id, id))
+      .where(and(eq(quests.id, id), eq(quests.userId, user.id)))
       .returning();
 
     if (!updatedQuest) {
@@ -155,8 +174,11 @@ export const deleteQuest = async (req, res) => {
   const { id } = req.params;
 
   try {
+    const user = await getUserFromReq(req, res);
+    if (!user) return;
+
     const [deletedQuest] = await db.delete(quests)
-      .where(eq(quests.id, id))
+      .where(and(eq(quests.id, id), eq(quests.userId, user.id)))
       .returning();
 
     if (!deletedQuest) {

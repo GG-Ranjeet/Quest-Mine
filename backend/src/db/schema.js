@@ -3,6 +3,7 @@ import { pgTable, integer, varchar, text, boolean, timestamp, primaryKey } from 
 // 1. Users Table
 export const users = pgTable('users', {
     id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+    clerkId: varchar('clerk_id', { length: 255 }).unique(),
     name: varchar('name', { length: 100 }).notNull(),
     title: varchar('title', { length: 100 }),
     level: integer('level').default(1),

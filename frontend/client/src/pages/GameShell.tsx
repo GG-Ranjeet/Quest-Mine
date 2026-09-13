@@ -57,6 +57,13 @@ export function GameShell() {
   const { data: activeQuests, isLoading: isQuestsLoading } = useQuestsData();
   const completeQuestMutation = useCompleteQuest();
 
+  // Once we've ever received data (even null/empty), lock out the loading screen forever.
+  // This prevents background refetches, retries, and state blips from ever showing it again.
+  const hasLoadedRef = useRef(false);
+  if (!isUserLoading && !isQuestsLoading) {
+    hasLoadedRef.current = true;
+  }
+
   const coins = user?.coins || 0;
   const xp = user?.xp || 0;
   const currentQuests = activeQuests || quests;
@@ -107,7 +114,10 @@ export function GameShell() {
     return () => clearTimeout(timer);
   }, [toast]);
 
-  if (isUserLoading || isQuestsLoading) {
+  // Only show loading screen on the very first page load — never again.
+  // hasLoadedRef is permanently set to true after the first non-loading state,
+  // so no background refetch, retry, or auth state change can ever trigger it again.
+  if (!hasLoadedRef.current && (isUserLoading || isQuestsLoading)) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg)', color: 'var(--cream)' }}>
         <span className="pulse" style={{ fontSize: '3rem', marginBottom: '1rem' }}>✦</span>
@@ -115,6 +125,7 @@ export function GameShell() {
       </div>
     );
   }
+
 
   return (
     <div className="app-shell">
