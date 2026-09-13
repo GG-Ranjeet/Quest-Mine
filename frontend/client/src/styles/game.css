@@ -269,11 +269,25 @@
   min-width: 0;
 }
 .biome-stage {
-  height: 432px;
+  height: 520px;
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(219, 193, 149, 0.2);
   background: #0c1317;
+}
+.overlay-rail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, rgba(6, 13, 16, 0.8) 20%, rgba(6, 13, 16, 0.95));
+  padding: 32px 48px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .stage-bg {
   position: absolute;

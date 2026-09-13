@@ -6,7 +6,7 @@ import { Panel } from "../ui/custom/Panel";
 import { SectionHead } from "../ui/custom/SectionHead";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/overlays/dialog";
 import type { EquipmentState } from "../../pages/GameShell";
-import { useUserData, useCraftItem, useAddQuest, useQuestsData } from "../../hooks/useGameData";
+import { useUserData, useCraftItem, useAddQuest, useQuestsData, useEditQuest } from "../../hooks/useGameData";
 
 export function SecondaryContent({ location, equipment, setEquipment, inventory = [] }: { location: string; equipment?: EquipmentState; setEquipment?: React.Dispatch<React.SetStateAction<EquipmentState>>; inventory?: any[] }) {
   const title = navItems.find(([path]) => path === location)?.[1] || "Journal";
@@ -15,6 +15,7 @@ export function SecondaryContent({ location, equipment, setEquipment, inventory 
   const { data: activeQuests } = useQuestsData();
   const craftMutation = useCraftItem();
   const addQuestMutation = useAddQuest();
+  const editQuestMutation = useEditQuest();
 
   const [selectedSlot, setSelectedSlot] = useState<keyof EquipmentState | null>(null);
   const [inventoryFilter, setInventoryFilter] = useState<'All' | 'Materials' | 'Equipment'>('All');
@@ -24,24 +25,77 @@ export function SecondaryContent({ location, equipment, setEquipment, inventory 
   const [questCategory, setQuestCategory] = useState("General");
   const [questStat, setQuestStat] = useState("STR");
   const [questDifficulty, setQuestDifficulty] = useState("Easy");
+  const [questScheduledDate, setQuestScheduledDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [questIsEveryday, setQuestIsEveryday] = useState(false);
+  const [editingQuestId, setEditingQuestId] = useState<string | null>(null);
+  
+  // Weekly View State
+  const [selectedDateFilter, setSelectedDateFilter] = useState(() => new Date().toISOString().split('T')[0]);
 
   const handleAddQuest = (e: React.FormEvent) => {
     e.preventDefault();
     if (!questTitle.trim()) return;
-    addQuestMutation.mutate({
-      title: questTitle,
-      category: questCategory,
-      stat: questStat,
-      difficulty: questDifficulty
-    });
-    setQuestTitle(""); // Reset form
+    
+    if (editingQuestId) {
+      editQuestMutation.mutate({
+        id: editingQuestId,
+        updates: {
+          title: questTitle,
+          category: questCategory,
+          stat: questStat,
+          difficulty: questDifficulty,
+          scheduledDate: questScheduledDate,
+          isEveryday: questIsEveryday
+        }
+      });
+      setEditingQuestId(null);
+    } else {
+      addQuestMutation.mutate({
+        title: questTitle,
+        category: questCategory,
+        stat: questStat,
+        difficulty: questDifficulty,
+        scheduledDate: questScheduledDate,
+        isEveryday: questIsEveryday
+      });
+    }
+    
+    // Reset form
+    setQuestTitle(""); 
+    setQuestIsEveryday(false);
+    setQuestScheduledDate(new Date().toISOString().split('T')[0]);
   };
+
+  const handleEditClick = (q: any) => {
+    setEditingQuestId(q.id);
+    setQuestTitle(q.title);
+    setQuestCategory(q.category);
+    setQuestStat(q.stat);
+    setQuestDifficulty(q.difficulty);
+    setQuestScheduledDate(q.scheduledDate || new Date().toISOString().split('T')[0]);
+    setQuestIsEveryday(q.isEveryday || false);
+  };
+
   const handleEquip = (item: Equipment) => {
     if (selectedSlot && setEquipment) {
       setEquipment(prev => ({ ...prev, [selectedSlot]: item }));
     }
     setSelectedSlot(null);
   };
+  
+  const next7Days = Array.from({ length: 7 }).map((_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    return {
+      date: d.toISOString().split('T')[0],
+      dayName: d.toLocaleDateString('en-US', { weekday: 'short' }),
+      dayNumber: d.getDate()
+    };
+  });
+
+  const filteredQuests = activeQuests?.filter((q: any) => 
+    q.isEveryday || q.scheduledDate === selectedDateFilter
+  ) || [];
   
   return (
     <div className="secondary-grid">
@@ -316,37 +370,102 @@ export function SecondaryContent({ location, equipment, setEquipment, inventory 
                 </select>
               </div>
 
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem' }}>
+                <input 
+                  type="checkbox" 
+                  checked={questIsEveryday} 
+                  onChange={(e) => setQuestIsEveryday(e.target.checked)}
+                  id="everydayCheck"
+                  style={{ width: '1.2rem', height: '1.2rem' }}
+                />
+                <label htmlFor="everydayCheck" style={{ fontSize: '0.9rem', color: 'var(--cream)' }}>This is a Daily Habit (Everyday)</label>
+              </div>
+
+              {!questIsEveryday && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <label style={{ fontSize: '0.9rem', color: 'var(--cream)' }}>Scheduled Date</label>
+                  <input 
+                    type="date" 
+                    value={questScheduledDate}
+                    onChange={(e) => setQuestScheduledDate(e.target.value)}
+                    style={{ padding: '0.75rem', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border)', color: 'var(--cream)', borderRadius: '4px' }}
+                  />
+                </div>
+              )}
+
               <button 
                 type="submit" 
                 className="primary-button" 
-                disabled={addQuestMutation.isPending || !questTitle.trim()}
+                disabled={addQuestMutation.isPending || editQuestMutation.isPending || !questTitle.trim()}
                 style={{ padding: '1rem', marginTop: '1rem' }}
               >
-                {addQuestMutation.isPending ? 'Forging Quest...' : 'Add Quest to Log'}
+                {editingQuestId ? 'Save Changes' : (addQuestMutation.isPending ? 'Forging Quest...' : 'Add Quest to Log')}
               </button>
 
-              {addQuestMutation.isSuccess && (
-                <p style={{ color: 'var(--primary)', fontSize: '0.9rem', textAlign: 'center' }}>Quest successfully created!</p>
+              {editingQuestId && (
+                <button type="button" className="outline-button" onClick={() => {
+                  setEditingQuestId(null);
+                  setQuestTitle("");
+                }}>
+                  Cancel Edit
+                </button>
+              )}
+
+              {(addQuestMutation.isSuccess || editQuestMutation.isSuccess) && (
+                <p style={{ color: 'var(--primary)', fontSize: '0.9rem', textAlign: 'center' }}>Quest successfully saved!</p>
               )}
             </form>
             
-            <div style={{ marginTop: '2rem' }}>
-              <h4 style={{ marginBottom: '1rem', color: 'var(--muted)', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem' }}>Active Quest Log</h4>
+            <div style={{ marginTop: '2.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem' }}>
+                <h4 style={{ color: 'var(--cream)', margin: 0 }}>Active Quest Log</h4>
+              </div>
+
+              {/* 7-Day Calendar Picker */}
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
+                {next7Days.map(day => (
+                  <button
+                    key={day.date}
+                    onClick={() => setSelectedDateFilter(day.date)}
+                    style={{
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      minWidth: '4rem', padding: '0.5rem', borderRadius: '8px', cursor: 'pointer',
+                      background: selectedDateFilter === day.date ? 'var(--primary)' : 'rgba(0,0,0,0.4)',
+                      border: `1px solid ${selectedDateFilter === day.date ? 'var(--primary)' : 'rgba(255,255,255,0.1)'}`,
+                      color: selectedDateFilter === day.date ? '#000' : 'var(--muted)',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>{day.dayName}</span>
+                    <span style={{ fontSize: '1.2rem', fontWeight: 800, color: selectedDateFilter === day.date ? '#000' : 'var(--cream)' }}>{day.dayNumber}</span>
+                  </button>
+                ))}
+              </div>
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {activeQuests && activeQuests.length > 0 ? (
-                  activeQuests.map((q: any) => (
+                {filteredQuests.length > 0 ? (
+                  filteredQuests.map((q: any) => (
                     <div key={q.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.05)' }}>
                       <div>
-                        <b style={{ color: 'var(--cream)', display: 'block', marginBottom: '0.25rem' }}>{q.title}</b>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                          <b style={{ color: 'var(--cream)', display: 'block' }}>{q.title}</b>
+                          {q.isEveryday && <span style={{ fontSize: '0.65rem', background: 'var(--primary)', color: '#000', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>DAILY</span>}
+                        </div>
                         <small style={{ color: 'var(--muted)' }}>{q.difficulty} • {q.stat} • {q.category}</small>
                       </div>
-                      <div style={{ textAlign: 'right' }}>
+                      <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.25rem' }}>
                         <b style={{ color: 'var(--primary)', display: 'block' }}>+{q.xp} XP</b>
+                        <button 
+                          onClick={() => handleEditClick(q)}
+                          style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '0.8rem', textDecoration: 'underline' }}
+                        >
+                          Edit
+                        </button>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p style={{ color: 'var(--muted)', fontSize: '0.9rem', fontStyle: 'italic' }}>No active quests. Forge a new one above!</p>
+                  <p style={{ color: 'var(--muted)', fontSize: '0.9rem', fontStyle: 'italic', textAlign: 'center', padding: '1rem 0' }}>No active quests scheduled for this day. Forge a new one above!</p>
                 )}
               </div>
             </div>

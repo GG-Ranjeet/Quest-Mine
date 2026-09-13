@@ -25,12 +25,23 @@ async function seed() {
 
     console.log(`👤 Seeded user: ${insertedUser.name} (ID: ${insertedUser.id})`);
 
-    // 3. Insert mock quests using mass insert batching
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+    
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+
     const mockQuests = [
-      { id: "q1", title: "Complete deep-work sprint", category: "Focus", stat: "Intelligence", duration: "90m", difficulty: "Hard", rarity: "Legendary", xp: 120 },
-      { id: "q2", title: "Morning meditation", category: "Mindfulness", stat: "Wisdom", duration: "15m", difficulty: "Easy", rarity: "Common", xp: 30 },
-      { id: "q3", title: "Review pull requests", category: "Work", stat: "Intelligence", duration: "45m", difficulty: "Medium", rarity: "Rare", xp: 60 },
-      { id: "q4", title: "Go for a run", category: "Fitness", stat: "Strength", duration: "30m", difficulty: "Medium", rarity: "Uncommon", xp: 50 },
+      { id: "q1", title: "Complete deep-work sprint", category: "Focus", stat: "Intelligence", difficulty: "Hard", xp: 120, userId: insertedUser.id, isEveryday: true },
+      { id: "q2", title: "Morning meditation", category: "Mindfulness", stat: "Wisdom", difficulty: "Easy", xp: 30, userId: insertedUser.id, scheduledDate: todayStr },
+      { id: "q3", title: "Review pull requests", category: "Work", stat: "Intelligence", difficulty: "Medium", xp: 60, userId: insertedUser.id, scheduledDate: tomorrowStr },
+      { id: "q4", title: "Go for a run", category: "Fitness", stat: "Strength", difficulty: "Medium", xp: 50, userId: insertedUser.id, scheduledDate: yesterdayStr },
+      { id: "q5", title: "Read 20 pages", category: "General", stat: "Wisdom", difficulty: "Easy", xp: 20, userId: insertedUser.id, scheduledDate: todayStr },
     ];
     await db.insert(quests).values(mockQuests);
     console.log(`⚔️  Seeded ${mockQuests.length} quests.`);

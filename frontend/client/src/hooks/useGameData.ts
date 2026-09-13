@@ -91,8 +91,22 @@ export function useAddQuest() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (questData: { title: string, category: string, stat: string, difficulty: string }) => {
+    mutationFn: (questData: { title: string, category: string, stat: string, difficulty: string, scheduledDate?: string, isEveryday?: boolean }) => {
       return api.addQuest(questData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['quests'] });
+      queryClient.invalidateQueries({ queryKey: ['user'] }); // In case they got the daily bonus
+    }
+  });
+}
+
+export function useEditQuest() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, updates }: { id: string, updates: Partial<{ title: string, category: string, stat: string, difficulty: string, scheduledDate: string, isEveryday: boolean }> }) => {
+      return api.editQuest(id, updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quests'] });

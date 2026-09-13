@@ -21,6 +21,8 @@ export const quests = pgTable('quests', {
     xp: integer('xp'),
     completed: boolean('completed').default(false),
     userId: integer('user_id').references(() => users.id, { onDelete: 'cascade' }),
+    scheduledDate: varchar('scheduled_date', { length: 50 }),
+    isEveryday: boolean('is_everyday').default(false),
 });
 
 

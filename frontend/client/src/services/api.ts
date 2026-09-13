@@ -43,7 +43,7 @@ export const api = {
     return res.json();
   },
 
-  async addQuest(questData: { title: string, category: string, stat: string, difficulty: string }) {
+  async addQuest(questData: { title: string, category: string, stat: string, difficulty: string, scheduledDate?: string, isEveryday?: boolean }) {
     const res = await fetch(`${API_BASE}/quests`, {
       method: 'POST',
       headers: {
@@ -54,6 +54,21 @@ export const api = {
     if (!res.ok) {
       const data = await res.json();
       throw new Error(data.error || 'Failed to create quest');
+    }
+    return res.json();
+  },
+
+  async editQuest(id: string, updates: Partial<{ title: string, category: string, stat: string, difficulty: string, scheduledDate: string, isEveryday: boolean }>) {
+    const res = await fetch(`${API_BASE}/quests/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updates),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error || 'Failed to update quest');
     }
     return res.json();
   },

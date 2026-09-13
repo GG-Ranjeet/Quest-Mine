@@ -82,7 +82,7 @@ export const completeQuest = async (req, res) => {
 };
 
 export const createQuest = async (req, res) => {
-  const { title, category, stat, difficulty } = req.body;
+  const { title, category, stat, difficulty, scheduledDate, isEveryday } = req.body;
   
   if (!title) {
     return res.status(400).json({ error: 'Quest title is required' });
@@ -102,6 +102,14 @@ export const createQuest = async (req, res) => {
     // Scale with user level (stat multiplier approximation)
     const calculatedXP = baseXP + (user.level * 2);
 
+    // If scheduled for today, grant +1 XP as requested
+    const today = new Date().toISOString().split('T')[0];
+    if (scheduledDate === today || isEveryday) {
+      await db.update(users)
+        .set({ xp: (user.xp || 0) + 1 })
+        .where(eq(users.id, user.id));
+    }
+
     const [newQuest] = await db.insert(quests).values({
       id: Date.now().toString(),
       title,
@@ -110,7 +118,9 @@ export const createQuest = async (req, res) => {
       difficulty: difficulty || 'Easy',
       xp: calculatedXP,
       completed: false,
-      userId: user.id
+      userId: user.id,
+      scheduledDate: scheduledDate || today,
+      isEveryday: isEveryday || false
     }).returning();
     
     res.status(201).json(newQuest);

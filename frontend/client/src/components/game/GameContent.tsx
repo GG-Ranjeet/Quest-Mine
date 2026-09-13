@@ -39,22 +39,6 @@ export function GameContent({
               </span>
             </div>
           </div>
-          <div className="stage-character">
-            <div className="mine-sparkles">
-              <i />
-              <i />
-              <i />
-              <i />
-            </div>
-            <img
-              src="/questmine-mascot.png"
-              alt="Your character in Crystal Caverns"
-            />
-            <div className="character-name">
-              <span>RIN</span>
-              <small>THE WAYFINDER</small>
-            </div>
-          </div>
           <div className="ore-deposit" ref={oreRef}>
             <div className="ore-glow" />
             <div className="ore-crystal">✦</div>
@@ -65,6 +49,43 @@ export function GameContent({
           <div className="stage-caption">
             <span>THE CAVERN HUMS WITH POTENTIAL</span>
             <span>Biome rotation in 08h 42m</span>
+          </div>
+          <div className="overlay-rail">
+            <div className="recent-heading" style={{ marginTop: 0 }}>
+              <SectionHead
+                eyebrow="UP NEXT"
+                title="Daily quests"
+                action="See all"
+              />
+            </div>
+            <div className="mini-quests">
+              {activeQuests.filter((q: any) => q.id !== selectedQuest?.id).slice(0, 4).map((quest: any) => (
+                <button
+                  key={quest.id}
+                  className={`mini-quest ${selectedQuest.id === quest.id ? "selected" : ""}`}
+                  onClick={() => setSelectedQuest(quest)}
+                  style={{ background: 'rgba(0,0,0,0.6)', borderColor: 'rgba(255,255,255,0.08)' }}
+                >
+                  <span className="mini-icon">
+                    {quest.stat === "Strength"
+                      ? "⚔"
+                      : quest.stat === "Wisdom"
+                        ? "◌"
+                        : "◒"}
+                  </span>
+                  <span>
+                    <b>{quest.title}</b>
+                    <small>
+                      {quest.category} · {quest.duration || "Daily"}
+                    </small>
+                  </span>
+                  <span className="mini-xp">
+                    +{quest.xp}
+                    <small>XP</small>
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
         </section>
         <Panel className="boss-panel">
@@ -109,11 +130,12 @@ export function GameContent({
           title="Quest scroll"
           action="View journal"
         />
-        <div className="quest-scroll">
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <div className="quest-scroll">
           <div className="scroll-fold" />
           <div className="quest-inner">
             <div className="quest-topline">
-              <RarityBadge rarity={selectedQuest.rarity} />
+              <RarityBadge rarity={selectedQuest.rarity || 'Common'} />
               <span className="quest-category">
                 {selectedQuest.category} · {selectedQuest.stat}
               </span>
@@ -126,13 +148,13 @@ export function GameContent({
             <div className="quest-facts">
               <span>
                 <b>DIFFICULTY</b>
-                <strong className={selectedQuest.difficulty.toLowerCase()}>
-                  {selectedQuest.difficulty}
+                <strong className={(selectedQuest.difficulty || 'Easy').toLowerCase()}>
+                  {selectedQuest.difficulty || 'Easy'}
                 </strong>
               </span>
               <span>
                 <b>DURATION</b>
-                <strong>{selectedQuest.duration}</strong>
+                <strong>{selectedQuest.duration || "N/A"}</strong>
               </span>
               <span>
                 <b>BASE XP</b>
@@ -141,7 +163,7 @@ export function GameContent({
             </div>
             <div className="quest-drops">
               <span>Possible drops</span>
-              {(selectedQuest.drops || []).map((drop: string) => (
+              {(selectedQuest.drops || ['Stone', 'Crystal']).map((drop: string) => (
                 <b key={drop}>{drop}</b>
               ))}
             </div>
@@ -172,41 +194,8 @@ export function GameContent({
               </b>{" "}
               to the weekly boss.
             </div>
+            </div>
           </div>
-        </div>
-        <div className="recent-heading">
-          <SectionHead
-            eyebrow="UP NEXT"
-            title="Daily quests"
-            action="See all"
-          />
-        </div>
-        <div className="mini-quests">
-          {activeQuests.filter((q: any) => q.id !== selectedQuest?.id).slice(0, 3).map((quest: any) => (
-            <button
-              key={quest.id}
-              className={`mini-quest ${selectedQuest.id === quest.id ? "selected" : ""}`}
-              onClick={() => setSelectedQuest(quest)}
-            >
-              <span className="mini-icon">
-                {quest.stat === "Strength"
-                  ? "⚔"
-                  : quest.stat === "Wisdom"
-                    ? "◌"
-                    : "◒"}
-              </span>
-              <span>
-                <b>{quest.title}</b>
-                <small>
-                  {quest.category} · {quest.duration}
-                </small>
-              </span>
-              <span className="mini-xp">
-                +{quest.xp}
-                <small>XP</small>
-              </span>
-            </button>
-          ))}
         </div>
       </aside>
     </div>
