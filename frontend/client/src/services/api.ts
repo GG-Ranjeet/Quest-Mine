@@ -1,0 +1,30 @@
+const API_BASE = 'http://localhost:5000/api';
+
+export const api = {
+  async fetchUserProfile() {
+    const res = await fetch(`${API_BASE}/user`);
+    if (!res.ok) throw new Error('Failed to fetch user');
+    return res.json();
+  },
+
+  async fetchActiveQuests() {
+    const res = await fetch(`${API_BASE}/quests`);
+    if (!res.ok) throw new Error('Failed to fetch quests');
+    return res.json();
+  },
+
+  async completeQuest(questId: string, damage: number = 40) {
+    const res = await fetch(`${API_BASE}/quests/complete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ questId, damage }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error || 'Failed to complete quest');
+    }
+    return res.json();
+  },
+};

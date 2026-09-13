@@ -23,6 +23,7 @@ import { GameProgress } from "../components/ui/custom/GameProgress";
 import { GameContent } from "../components/game/GameContent";
 import { SecondaryContent } from "../components/game/SecondaryContent";
 import type { Equipment } from "../lib/gameData";
+import { useUserData, useQuestsData, useCompleteQuest } from "../hooks/useGameData";
 
 export type EquipmentState = {
   armor1: Equipment | null;
@@ -36,13 +37,10 @@ export type EquipmentState = {
 export function GameShell() {
   const [location] = useLocation();
   const [mobileMenu, setMobileMenu] = useState(false);
-  const [coins, setCoins] = useState(1284);
-  const [xp, setXp] = useState(4820);
   const [energy, setEnergy] = useState(68);
   const [questsDone, setQuestsDone] = useState(3);
   const [bossHp, setBossHp] = useState(640);
   const [toast, setToast] = useState("");
-  const [selectedQuest, setSelectedQuest] = useState<Quest>(quests[0]);
   const [completing, setCompleting] = useState(false);
   
   const [equipment, setEquipment] = useState<EquipmentState>({
@@ -53,55 +51,55 @@ export function GameShell() {
     accessory2: null,
     accessory3: null,
   });
+
+  const { data: user } = useUserData();
+  const { data: activeQuests } = useQuestsData();
+  const completeQuestMutation = useCompleteQuest();
+
+  const coins = user?.coins || 0;
+  const xp = user?.xp || 0;
+  const currentQuests = activeQuests || quests;
+  
+  const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
+  const selectedQuest = currentQuests.find((q: Quest) => q.id === selectedQuestId) || currentQuests[0] || quests[0];
   const stageRef = useRef<HTMLDivElement>(null);
   const oreRef = useRef<HTMLDivElement>(null);
   const rewardRef = useRef<HTMLDivElement>(null);
   const pageName = navItems.find(([path]) => path === location)?.[1] || "Play";
   const complete = async () => {
-    if (completing) return;
+    if (completing || !selectedQuest.id) return;
     setCompleting(true);
     setToast("");
     const tl = gsap.timeline();
     if (stageRef.current && oreRef.current) {
-      tl.to(stageRef.current, {
-        scale: 1.025,
-        duration: 0.22,
-        ease: "power2.out",
-      })
-        .to(oreRef.current, {
-          rotate: -8,
-          x: -7,
-          duration: 0.14,
-          yoyo: true,
-          repeat: 3,
-          ease: "power1.inOut",
-        })
-        .to(oreRef.current, {
-          scale: 1.14,
-          filter: "brightness(1.8)",
-          duration: 0.15,
-        })
-        .to(oreRef.current, {
-          scale: 1,
-          filter: "brightness(1)",
-          duration: 0.3,
-        });
+      tl.to(stageRef.current, { scale: 1.025, duration: 0.22, ease: "power2.out" })
+        .to(oreRef.current, { rotate: -8, x: -7, duration: 0.14, yoyo: true, repeat: 3, ease: "power1.inOut" })
+        .to(oreRef.current, { scale: 1.14, filter: "brightness(1.8)", duration: 0.15 })
+        .to(oreRef.current, { scale: 1, filter: "brightness(1)", duration: 0.3 });
     }
-    const result = await completeQuestMock(selectedQuest);
-    setXp(v => v + result.xp);
-    setCoins(v => v + result.coins);
+    
+    const estimatedXp = selectedQuest.xp || 40;
+    const estimatedCoins = selectedQuest.coins || 25;
+    const damage = selectedQuest.difficulty === 'Hard' ? 150 : selectedQuest.difficulty === 'Medium' ? 80 : 40;
+    
     setEnergy(v => Math.max(0, v - 7));
     setQuestsDone(v => v + 1);
-    setBossHp(v => Math.max(0, v - result.damage));
+    setBossHp(v => Math.max(0, v - damage));
+    
     if (rewardRef.current)
-      gsap.fromTo(
-        rewardRef.current,
-        { opacity: 0, y: 16 },
-        { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }
-      );
-    setToast(`Quest complete · +${result.xp} XP · +${result.coins} coins`);
+      gsap.fromTo(rewardRef.current, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" });
+      
+    setToast(`Quest complete · +${estimatedXp} XP · +${estimatedCoins} coins`);
     setCompleting(false);
+
+    completeQuestMutation.mutate({
+      questId: selectedQuest.id,
+      damage,
+      questXp: estimatedXp,
+      questCoins: estimatedCoins
+    });
   };
+
   useEffect(() => {
     if (!toast) return;
     const timer = setTimeout(() => setToast(""), 4200);
@@ -219,7 +217,7 @@ export function GameShell() {
             <GameContent
               {...{
                 selectedQuest,
-                setSelectedQuest,
+                setSelectedQuest: (q: Quest) => setSelectedQuestId(q.id),
                 completing,
                 complete,
                 stageRef,
@@ -228,6 +226,7 @@ export function GameShell() {
                 questsDone,
                 bossHp,
                 toast,
+                activeQuests: currentQuests,
               }}
             />
           ) : (

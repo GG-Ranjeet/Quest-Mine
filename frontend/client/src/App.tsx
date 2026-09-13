@@ -3,12 +3,18 @@ import { Landing } from "./pages/Landing";
 import { GameShell } from "./pages/GameShell";
 import "./index.css";
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
+
 function App() {
   return (
-    <Switch>
-      <Route path="/" component={Landing} />
-      <Route component={GameShell} />
-    </Switch>
+    <QueryClientProvider client={queryClient}>
+      <Switch>
+        <Route path="/" component={Landing} />
+        <Route component={GameShell} />
+      </Switch>
+    </QueryClientProvider>
   );
 }
 

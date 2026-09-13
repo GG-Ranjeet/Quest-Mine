@@ -12,6 +12,7 @@ export function GameContent({
   stageRef,
   oreRef,
   bossHp,
+  activeQuests = [],
 }: any) {
   return (
     <div className="game-grid">
@@ -140,7 +141,7 @@ export function GameContent({
             </div>
             <div className="quest-drops">
               <span>Possible drops</span>
-              {selectedQuest.drops.map((drop: string) => (
+              {(selectedQuest.drops || []).map((drop: string) => (
                 <b key={drop}>{drop}</b>
               ))}
             </div>
@@ -181,7 +182,7 @@ export function GameContent({
           />
         </div>
         <div className="mini-quests">
-          {quests.slice(1, 4).map(quest => (
+          {activeQuests.filter((q: any) => q.id !== selectedQuest?.id).slice(0, 3).map((quest: any) => (
             <button
               key={quest.id}
               className={`mini-quest ${selectedQuest.id === quest.id ? "selected" : ""}`}

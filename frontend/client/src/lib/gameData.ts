@@ -10,8 +10,8 @@ export type Quest = {
   rarity: Rarity;
   duration: string;
   xp: number;
-  coins: number;
-  drops: string[];
+  coins?: number;
+  drops?: string[];
   progress?: number;
   completed?: boolean;
 };
