@@ -25,6 +25,7 @@ import { SecondaryContent } from "../components/game/SecondaryContent";
 import type { Equipment } from "../lib/gameData";
 import { useUserData, useQuestsData, useCompleteQuest } from "../hooks/useGameData";
 import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/react";
+import { xpProgressLabel, xpProgressPercent } from "../lib/xp";
 
 export type EquipmentState = {
   armor1: Equipment | null;
@@ -64,8 +65,9 @@ export function GameShell() {
     hasLoadedRef.current = true;
   }
 
-  const coins = user?.coins || 0;
-  const xp = user?.xp || 0;
+  const coins = user?.coins ?? 0;
+  const level = user?.level ?? 0;
+  const xp    = user?.xp   ?? 0;
   const currentQuests = activeQuests || quests;
   
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
@@ -137,13 +139,13 @@ export function GameShell() {
           </span>
         </Link>
         <div className="hud-profile">
-          <div className="level-badge">07</div>
+          <div className="level-badge">{String(level).padStart(2, '0')}</div>
           <div className="hud-player">
             <div className="hud-player-row">
-              <b>Rin, the Wayfinder</b>
-              <span>4,820 / 6,000 XP</span>
+              <b>{user?.name ?? 'Adventurer'}</b>
+              <span>{xpProgressLabel(xp, level)}</span>
             </div>
-            <GameProgress value={80} tone="xp" />
+            <GameProgress value={xpProgressPercent(xp, level)} tone="xp" />
           </div>
         </div>
         <div className="hud-counters">

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../services/api';
 import type { Quest } from '../lib/gameData';
+import { applyXPGain } from '../lib/xp';
 
 export function useUserData() {
   return useQuery({
@@ -35,15 +36,15 @@ export function useCompleteQuest() {
       const previousUser = queryClient.getQueryData(['user']);
       const previousQuests = queryClient.getQueryData(['quests']);
 
-      // Optimistically update the user data
+      // Optimistically update user data using the real XP/level formula
       queryClient.setQueryData(['user'], (old: any) => {
         if (!old) return old;
+        const { newXp, newLevel } = applyXPGain(old.xp ?? 0, old.level ?? 0, questXp);
         return {
           ...old,
-          xp: old.xp + questXp,
+          xp: newXp,
+          level: newLevel,
           coins: old.coins + questCoins,
-          energy: Math.max(0, old.energy - 7),
-          boss_hp: Math.max(0, old.boss_hp - damage),
         };
       });
 
