@@ -35,11 +35,17 @@ async function seed() {
     await db.insert(quests).values(mockQuests);
     console.log(`⚔️  Seeded ${mockQuests.length} quests.`);
 
-    // 4. Insert mock items (ores) into the database
+    // 4. Insert mock items (ores and equipment) into the database
     const mockItems = [
       { id: 'ore_iron', name: 'Iron Ore', itemType: 'Material', rarity: 'Common', icon: '🪨', sellPrice: 10 },
       { id: 'ore_gold', name: 'Gold Ore', itemType: 'Material', rarity: 'Rare', icon: '🪙', sellPrice: 50 },
       { id: 'ore_diamond', name: 'Diamond Ore', itemType: 'Material', rarity: 'Legendary', icon: '💎', sellPrice: 200 },
+      { id: 'eq1', name: 'Iron Plate', itemType: 'Armor', rarity: 'Uncommon', icon: '🛡️', stats: '+10 DEF', sellPrice: 100 },
+      { id: 'eq2', name: 'Crystal Guard', itemType: 'Armor', rarity: 'Rare', icon: '🛡️', stats: '+25 DEF', sellPrice: 300 },
+      { id: 'eq3', name: 'Shadow Cloak', itemType: 'Armor', rarity: 'Epic', icon: '🧥', stats: '+40 DEF, +5 AGI', sellPrice: 800 },
+      { id: 'eq4', name: 'Ring of Focus', itemType: 'Accessory', rarity: 'Uncommon', icon: '💍', stats: '+5 INT', sellPrice: 150 },
+      { id: 'eq5', name: 'Amulet of Time', itemType: 'Accessory', rarity: 'Rare', icon: '📿', stats: '+10 WIS', sellPrice: 400 },
+      { id: 'eq6', name: 'Wayfinder Charm', itemType: 'Accessory', rarity: 'Legendary', icon: '✨', stats: '+20 ALL', sellPrice: 2000 },
     ];
     await db.insert(items).values(mockItems);
     console.log(`💎 Seeded master item list.`);
@@ -47,7 +53,10 @@ async function seed() {
     // 5. Connect item instances to Rin's inventory
     await db.insert(userInventories).values([
       { userId: insertedUser.id, itemId: 'ore_iron', quantity: 5 },
-      { userId: insertedUser.id, itemId: 'ore_diamond', quantity: 1 }
+      { userId: insertedUser.id, itemId: 'ore_diamond', quantity: 1 },
+      { userId: insertedUser.id, itemId: 'eq1', quantity: 1 },
+      { userId: insertedUser.id, itemId: 'eq4', quantity: 1 },
+      { userId: insertedUser.id, itemId: 'eq6', quantity: 1 },
     ]);
     console.log(`🎒 Populated user inventory.`);
 

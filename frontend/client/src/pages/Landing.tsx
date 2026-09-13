@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { ChevronRight } from "lucide-react";
+import { SignInButton, Show, UserButton } from "@clerk/react";
 
 export function Landing() {
   return (
@@ -18,9 +19,21 @@ export function Landing() {
           <a href="#features">Features</a>
           <a href="#about">Why QuestMine</a>
         </div>
-        <Link href="/game" className="outline-button">
-          Enter the mine <ChevronRight size={15} />
-        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <Show when="signed-out">
+            <SignInButton mode="modal">
+              <button className="outline-button">
+                Sign In
+              </button>
+            </SignInButton>
+          </Show>
+          <Show when="signed-in">
+            <UserButton />
+            <Link href="/game" className="outline-button">
+              Enter the mine <ChevronRight size={15} />
+            </Link>
+          </Show>
+        </div>
       </header>
       <main className="landing-hero">
         <div className="hero-copy">
@@ -38,9 +51,18 @@ export function Landing() {
             equipment. Level up your character — and yourself.
           </p>
           <div className="hero-actions">
-            <Link href="/game" className="primary-button">
-              Begin your journey <ChevronRight size={17} />
-            </Link>
+            <Show when="signed-in">
+              <Link href="/game" className="primary-button">
+                Begin your journey <ChevronRight size={17} />
+              </Link>
+            </Show>
+            <Show when="signed-out">
+              <SignInButton mode="modal">
+                <button className="primary-button">
+                  Begin your journey <ChevronRight size={17} />
+                </button>
+              </SignInButton>
+            </Show>
             <a href="#loop" className="quiet-link">
               Explore the world <span>↓</span>
             </a>

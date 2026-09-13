@@ -1,5 +1,5 @@
 import { db } from '../db/db.js';
-import { users } from '../db/schema.js';
+import { users, userInventories, items } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 
 export const getUserProfile = async (req, res) => {
@@ -10,7 +10,26 @@ export const getUserProfile = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
     
-    res.json(allUsers[0]);
+    const user = allUsers[0];
+
+    const inventoryData = await db.select({
+      id: items.id,
+      name: items.name,
+      itemType: items.itemType,
+      rarity: items.rarity,
+      icon: items.icon,
+      stats: items.stats,
+      sellPrice: items.sellPrice,
+      quantity: userInventories.quantity
+    })
+    .from(userInventories)
+    .innerJoin(items, eq(userInventories.itemId, items.id))
+    .where(eq(userInventories.userId, user.id));
+
+    res.json({
+      ...user,
+      inventory: inventoryData
+    });
   } catch (error) {
     console.error('Error fetching user profile:', error);
     res.status(500).json({ error: 'Server error' });

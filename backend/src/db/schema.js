@@ -20,6 +20,7 @@ export const quests = pgTable('quests', {
     rarity: varchar('rarity', { length: 50 }),
     xp: integer('xp'),
     completed: boolean('completed').default(false),
+    userId: integer('user_id').references(() => users.id, { onDelete: 'cascade' }),
 });
 
 
@@ -30,6 +31,7 @@ export const items = pgTable('items', {
     itemType: varchar('item_type', { length: 50 }).notNull(),
     rarity: varchar('rarity', { length: 20 }).notNull(),
     icon: varchar('icon', { length: 10 }),
+    stats: varchar('stats', { length: 100 }),
     sellPrice: integer('sell_price').default(0),
 });
 

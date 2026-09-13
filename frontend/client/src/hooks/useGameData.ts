@@ -73,3 +73,29 @@ export function useCompleteQuest() {
     },
   });
 }
+
+export function useCraftItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (recipeId: string) => {
+      return api.craftItem(recipeId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+    }
+  });
+}
+
+export function useAddQuest() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (questData: { title: string, category: string, stat: string, difficulty: string }) => {
+      return api.addQuest(questData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['quests'] });
+    }
+  });
+}

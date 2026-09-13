@@ -27,4 +27,34 @@ export const api = {
     }
     return res.json();
   },
+
+  async craftItem(recipeId: string) {
+    const res = await fetch(`${API_BASE}/craft`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ recipeId }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error || 'Failed to craft item');
+    }
+    return res.json();
+  },
+
+  async addQuest(questData: { title: string, category: string, stat: string, difficulty: string }) {
+    const res = await fetch(`${API_BASE}/quests`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(questData),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error || 'Failed to create quest');
+    }
+    return res.json();
+  },
 };

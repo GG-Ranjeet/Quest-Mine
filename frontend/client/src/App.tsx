@@ -7,12 +7,28 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient();
 
+import { Redirect } from "wouter";
+import { Show } from "@clerk/react";
+
+function ProtectedGameShell() {
+  return (
+    <>
+      <Show when="signed-in">
+        <GameShell />
+      </Show>
+      <Show when="signed-out">
+        <Redirect to="/" />
+      </Show>
+    </>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Switch>
         <Route path="/" component={Landing} />
-        <Route component={GameShell} />
+        <Route component={ProtectedGameShell} />
       </Switch>
     </QueryClientProvider>
   );

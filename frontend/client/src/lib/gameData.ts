@@ -49,8 +49,42 @@ export const inventoryEquipment: Equipment[] = [
   { id: 'eq6', name: 'Wayfinder Charm', type: 'Accessory', rarity: 'Legendary', icon: '✨', stats: '+20 ALL' },
 ];
 
+export type Recipe = {
+  id: string;
+  resultItemId: string; // The equipment ID it produces
+  costCoins: number;
+  ingredients: { itemId: string; quantity: number }[];
+};
+
+export const craftingRecipes: Recipe[] = [
+  {
+    id: 'recipe_iron_plate',
+    resultItemId: 'eq1', // Iron Plate
+    costCoins: 50,
+    ingredients: [{ itemId: 'ore_iron', quantity: 3 }]
+  },
+  {
+    id: 'recipe_crystal_guard',
+    resultItemId: 'eq2', // Crystal Guard
+    costCoins: 150,
+    ingredients: [{ itemId: 'ore_diamond', quantity: 1 }, { itemId: 'ore_iron', quantity: 2 }]
+  },
+  {
+    id: 'recipe_ring_of_focus',
+    resultItemId: 'eq4', // Ring of Focus
+    costCoins: 80,
+    ingredients: [{ itemId: 'ore_gold', quantity: 2 }]
+  },
+  {
+    id: 'recipe_wayfinder_charm',
+    resultItemId: 'eq6', // Wayfinder Charm
+    costCoins: 500,
+    ingredients: [{ itemId: 'ore_diamond', quantity: 3 }, { itemId: 'ore_gold', quantity: 5 }]
+  }
+];
+
 export const navItems = [
-  ['/', 'Home', '⌂'], ['/game', 'Play', '◈'], ['/quests', 'Quests', '☰'], ['/inventory', 'Inventory', '▦'], ['/forge', 'Forge', '⚒'], ['/character', 'Character', '♙'], ['/map', 'Map', '⌖'], ['/codex', 'Codex', '✧'], ['/shop', 'Shop', '◇'],
+  ['/', 'Home', '⌂'], ['/game', 'Play', '◈'], ['/quests', 'Add Quest', '＋'], ['/inventory', 'Inventory', '▦'], ['/craft', 'Craft', '⚒'], ['/character', 'Character', '♙'], ['/map', 'Map', '⌖'], ['/codex', 'Codex', '✧'], ['/shop', 'Shop', '◇'],
 ];
 
 export const stats = [

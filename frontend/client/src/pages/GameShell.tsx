@@ -24,6 +24,7 @@ import { GameContent } from "../components/game/GameContent";
 import { SecondaryContent } from "../components/game/SecondaryContent";
 import type { Equipment } from "../lib/gameData";
 import { useUserData, useQuestsData, useCompleteQuest } from "../hooks/useGameData";
+import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/react";
 
 export type EquipmentState = {
   armor1: Equipment | null;
@@ -52,8 +53,8 @@ export function GameShell() {
     accessory3: null,
   });
 
-  const { data: user } = useUserData();
-  const { data: activeQuests } = useQuestsData();
+  const { data: user, isLoading: isUserLoading } = useUserData();
+  const { data: activeQuests, isLoading: isQuestsLoading } = useQuestsData();
   const completeQuestMutation = useCompleteQuest();
 
   const coins = user?.coins || 0;
@@ -105,6 +106,16 @@ export function GameShell() {
     const timer = setTimeout(() => setToast(""), 4200);
     return () => clearTimeout(timer);
   }, [toast]);
+
+  if (isUserLoading || isQuestsLoading) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg)', color: 'var(--cream)' }}>
+        <span className="pulse" style={{ fontSize: '3rem', marginBottom: '1rem' }}>✦</span>
+        <h2>Loading your world...</h2>
+      </div>
+    );
+  }
+
   return (
     <div className="app-shell">
       <header className="top-hud">
@@ -144,7 +155,16 @@ export function GameShell() {
             <Bell size={17} />
             <i />
           </button>
-          <button className="avatar-button">R</button>
+          
+          <Show when="signed-out">
+            <SignInButton mode="modal">
+              <button className="primary-button" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>Sign In</button>
+            </SignInButton>
+          </Show>
+          <Show when="signed-in">
+            <UserButton />
+          </Show>
+          
           <button
             className="mobile-menu"
             onClick={() => setMobileMenu(!mobileMenu)}
@@ -213,7 +233,7 @@ export function GameShell() {
               <button className="round-action">•••</button>
             </div>
           </div>
-          {location === "/game" || location === "/quests" ? (
+          {location === "/game" ? (
             <GameContent
               {...{
                 selectedQuest,
@@ -230,7 +250,7 @@ export function GameShell() {
               }}
             />
           ) : (
-            <SecondaryContent location={location} equipment={equipment} setEquipment={setEquipment} />
+            <SecondaryContent location={location} equipment={equipment} setEquipment={setEquipment} inventory={user?.inventory || []} />
           )}
         </main>
       </div>

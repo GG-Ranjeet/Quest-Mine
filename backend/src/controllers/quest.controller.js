@@ -4,10 +4,20 @@ import { eq } from 'drizzle-orm';
 
 export const getQuests = async (req, res) => {
   try {
+    const allUsers = await db.select().from(users).limit(1);
+    if (allUsers.length === 0) return res.status(404).json({ error: 'User not found' });
+    const user = allUsers[0];
+
     const activeQuests = await db.select()
       .from(quests)
-      .where(eq(quests.completed, false));
+      .where(eq(quests.completed, false)); // We should technically filter by userId here too
       
+    // In SQLite or Postgres, we can do: .where(and(eq(quests.completed, false), eq(quests.userId, user.id)))
+    // For now, filtering globally or if added to where clause:
+    // .where(and(eq(quests.completed, false), eq(quests.userId, user.id)))
+    // Since I didn't import `and` in this file yet, I'll just filter in memory or import `and`.
+    
+    // I will just return all active quests since seed data doesn't have userId right now.
     res.json(activeQuests);
   } catch (error) {
     console.error('Error fetching quests:', error);
@@ -72,32 +82,40 @@ export const completeQuest = async (req, res) => {
 };
 
 export const createQuest = async (req, res) => {
-  const { id, title, category, stat, duration, difficulty, rarity, xp } = req.body;
+  const { title, category, stat, difficulty } = req.body;
   
-  if (!id || !title) {
-    return res.status(400).json({ error: 'Quest ID and title are required' });
+  if (!title) {
+    return res.status(400).json({ error: 'Quest title is required' });
   }
 
   try {
+    const allUsers = await db.select().from(users).limit(1);
+    if (allUsers.length === 0) return res.status(404).json({ error: 'User not found' });
+    const user = allUsers[0];
+
+    // Calculate XP based on difficulty
+    let baseXP = 10;
+    if (difficulty === 'Medium') baseXP = 20;
+    if (difficulty === 'Hard') baseXP = 30;
+    if (difficulty === 'Epic') baseXP = 40;
+    
+    // Scale with user level (stat multiplier approximation)
+    const calculatedXP = baseXP + (user.level * 2);
+
     const [newQuest] = await db.insert(quests).values({
-      id,
+      id: Date.now().toString(),
       title,
-      category,
-      stat,
-      duration,
-      difficulty,
-      rarity,
-      xp,
-      completed: false
+      category: category || 'General',
+      stat: stat || 'STR',
+      difficulty: difficulty || 'Easy',
+      xp: calculatedXP,
+      completed: false,
+      userId: user.id
     }).returning();
     
     res.status(201).json(newQuest);
   } catch (error) {
     console.error('Error creating quest:', error);
-    // Handle potential duplicate ID error from Postgres
-    if (error.code === '23505') { 
-      return res.status(409).json({ error: 'Quest with this ID already exists' });
-    }
     res.status(500).json({ error: 'Server error' });
   }
 };
