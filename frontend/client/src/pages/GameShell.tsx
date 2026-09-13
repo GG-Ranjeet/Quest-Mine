@@ -25,6 +25,7 @@ import { SecondaryContent } from "../components/game/SecondaryContent";
 import type { Equipment } from "../lib/gameData";
 import { useUserData, useQuestsData, useCompleteQuest } from "../hooks/useGameData";
 import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/react";
+import { xpProgressLabel, xpProgressPercent } from "../lib/xp";
 
 export type EquipmentState = {
   armor1: Equipment | null;
@@ -57,8 +58,16 @@ export function GameShell() {
   const { data: activeQuests, isLoading: isQuestsLoading } = useQuestsData();
   const completeQuestMutation = useCompleteQuest();
 
-  const coins = user?.coins || 0;
-  const xp = user?.xp || 0;
+  // Once we've ever received data (even null/empty), lock out the loading screen forever.
+  // This prevents background refetches, retries, and state blips from ever showing it again.
+  const hasLoadedRef = useRef(false);
+  if (!isUserLoading && !isQuestsLoading) {
+    hasLoadedRef.current = true;
+  }
+
+  const coins = user?.coins ?? 0;
+  const level = user?.level ?? 0;
+  const xp    = user?.xp   ?? 0;
   const currentQuests = activeQuests || quests;
   
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
@@ -107,7 +116,10 @@ export function GameShell() {
     return () => clearTimeout(timer);
   }, [toast]);
 
-  if (isUserLoading || isQuestsLoading) {
+  // Only show loading screen on the very first page load — never again.
+  // hasLoadedRef is permanently set to true after the first non-loading state,
+  // so no background refetch, retry, or auth state change can ever trigger it again.
+  if (!hasLoadedRef.current && (isUserLoading || isQuestsLoading)) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg)', color: 'var(--cream)' }}>
         <span className="pulse" style={{ fontSize: '3rem', marginBottom: '1rem' }}>✦</span>
@@ -115,6 +127,7 @@ export function GameShell() {
       </div>
     );
   }
+
 
   return (
     <div className="app-shell">
@@ -126,13 +139,13 @@ export function GameShell() {
           </span>
         </Link>
         <div className="hud-profile">
-          <div className="level-badge">07</div>
+          <div className="level-badge">{String(level).padStart(2, '0')}</div>
           <div className="hud-player">
             <div className="hud-player-row">
-              <b>Rin, the Wayfinder</b>
-              <span>4,820 / 6,000 XP</span>
+              <b>{user?.name ?? 'Adventurer'}</b>
+              <span>{xpProgressLabel(xp, level)}</span>
             </div>
-            <GameProgress value={80} tone="xp" />
+            <GameProgress value={xpProgressPercent(xp, level)} tone="xp" />
           </div>
         </div>
         <div className="hud-counters">

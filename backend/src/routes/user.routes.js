@@ -1,8 +1,19 @@
 import { Router } from 'express';
-import { getUserProfile } from '../controllers/user.controller.js';
+import express from 'express';
+import { getUserProfile, getAllUsers } from '../controllers/user.controller.js';
+import { handleClerkWebhook } from '../controllers/user.controller.js';
 
 const router = Router();
 
 router.get('/', getUserProfile);
+router.get('/all', getAllUsers);
 
 export default router;
+
+// Webhook router — MUST use raw body for svix signature verification
+export const webhookRouter = Router();
+webhookRouter.post(
+  '/clerk',
+  express.raw({ type: 'application/json' }),
+  handleClerkWebhook
+);
