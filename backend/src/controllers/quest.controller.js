@@ -70,3 +70,74 @@ export const completeQuest = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+export const createQuest = async (req, res) => {
+  const { id, title, category, stat, duration, difficulty, rarity, xp } = req.body;
+  
+  if (!id || !title) {
+    return res.status(400).json({ error: 'Quest ID and title are required' });
+  }
+
+  try {
+    const [newQuest] = await db.insert(quests).values({
+      id,
+      title,
+      category,
+      stat,
+      duration,
+      difficulty,
+      rarity,
+      xp,
+      completed: false
+    }).returning();
+    
+    res.status(201).json(newQuest);
+  } catch (error) {
+    console.error('Error creating quest:', error);
+    // Handle potential duplicate ID error from Postgres
+    if (error.code === '23505') { 
+      return res.status(409).json({ error: 'Quest with this ID already exists' });
+    }
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+export const updateQuest = async (req, res) => {
+  const { id } = req.params;
+  const updates = req.body; // { title, category, stat, etc. }
+
+  try {
+    const [updatedQuest] = await db.update(quests)
+      .set(updates)
+      .where(eq(quests.id, id))
+      .returning();
+
+    if (!updatedQuest) {
+      return res.status(404).json({ error: 'Quest not found' });
+    }
+
+    res.json(updatedQuest);
+  } catch (error) {
+    console.error('Error updating quest:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+export const deleteQuest = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [deletedQuest] = await db.delete(quests)
+      .where(eq(quests.id, id))
+      .returning();
+
+    if (!deletedQuest) {
+      return res.status(404).json({ error: 'Quest not found' });
+    }
+
+    res.json({ success: true, message: 'Quest deleted successfully', deletedQuest });
+  } catch (error) {
+    console.error('Error deleting quest:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};

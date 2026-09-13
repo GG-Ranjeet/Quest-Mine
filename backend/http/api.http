@@ -27,3 +27,34 @@ Content-Type: application/json
     "questId": "q1",
     "damage": 50
 }
+
+### ---------------------------
+### 3. Quest CRUD Operations
+### ---------------------------
+
+### Create a new Quest
+POST {{baseUrl}}/quests
+Content-Type: application/json
+
+{
+    "id": "q99",
+    "title": "Clean the house",
+    "category": "Chores",
+    "stat": "Strength",
+    "duration": "60m",
+    "difficulty": "Medium",
+    "rarity": "Common",
+    "xp": 45
+}
+
+### Update an existing Quest
+PUT {{baseUrl}}/quests/q99
+Content-Type: application/json
+
+{
+    "title": "Clean the entire house thoroughly",
+    "xp": 60
+}
+
+### Delete a Quest
+DELETE {{baseUrl}}/quests/q99

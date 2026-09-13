@@ -30,6 +30,25 @@ export const materials = [
   { name: 'Stone', qty: 24, color: '#85909d', icon: '⬟', rarity: 'Common' },
 ];
 
+export type EquipmentType = 'Armor' | 'Accessory';
+export type Equipment = {
+  id: string;
+  name: string;
+  type: EquipmentType;
+  rarity: Rarity;
+  icon: string;
+  stats: string;
+};
+
+export const inventoryEquipment: Equipment[] = [
+  { id: 'eq1', name: 'Iron Plate', type: 'Armor', rarity: 'Uncommon', icon: '🛡️', stats: '+10 DEF' },
+  { id: 'eq2', name: 'Crystal Guard', type: 'Armor', rarity: 'Rare', icon: '🛡️', stats: '+25 DEF' },
+  { id: 'eq3', name: 'Shadow Cloak', type: 'Armor', rarity: 'Epic', icon: '🧥', stats: '+40 DEF, +5 AGI' },
+  { id: 'eq4', name: 'Ring of Focus', type: 'Accessory', rarity: 'Uncommon', icon: '💍', stats: '+5 INT' },
+  { id: 'eq5', name: 'Amulet of Time', type: 'Accessory', rarity: 'Rare', icon: '📿', stats: '+10 WIS' },
+  { id: 'eq6', name: 'Wayfinder Charm', type: 'Accessory', rarity: 'Legendary', icon: '✨', stats: '+20 ALL' },
+];
+
 export const navItems = [
   ['/', 'Home', '⌂'], ['/game', 'Play', '◈'], ['/quests', 'Quests', '☰'], ['/inventory', 'Inventory', '▦'], ['/forge', 'Forge', '⚒'], ['/character', 'Character', '♙'], ['/map', 'Map', '⌖'], ['/codex', 'Codex', '✧'], ['/shop', 'Shop', '◇'],
 ];

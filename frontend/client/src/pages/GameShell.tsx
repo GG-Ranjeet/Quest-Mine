@@ -22,6 +22,16 @@ import {
 import { GameProgress } from "../components/ui/custom/GameProgress";
 import { GameContent } from "../components/game/GameContent";
 import { SecondaryContent } from "../components/game/SecondaryContent";
+import type { Equipment } from "../lib/gameData";
+
+export type EquipmentState = {
+  armor1: Equipment | null;
+  armor2: Equipment | null;
+  armor3: Equipment | null;
+  accessory1: Equipment | null;
+  accessory2: Equipment | null;
+  accessory3: Equipment | null;
+};
 
 export function GameShell() {
   const [location] = useLocation();
@@ -34,6 +44,15 @@ export function GameShell() {
   const [toast, setToast] = useState("");
   const [selectedQuest, setSelectedQuest] = useState<Quest>(quests[0]);
   const [completing, setCompleting] = useState(false);
+  
+  const [equipment, setEquipment] = useState<EquipmentState>({
+    armor1: null,
+    armor2: null,
+    armor3: null,
+    accessory1: null,
+    accessory2: null,
+    accessory3: null,
+  });
   const stageRef = useRef<HTMLDivElement>(null);
   const oreRef = useRef<HTMLDivElement>(null);
   const rewardRef = useRef<HTMLDivElement>(null);
@@ -212,7 +231,7 @@ export function GameShell() {
               }}
             />
           ) : (
-            <SecondaryContent location={location} />
+            <SecondaryContent location={location} equipment={equipment} setEquipment={setEquipment} />
           )}
         </main>
       </div>
