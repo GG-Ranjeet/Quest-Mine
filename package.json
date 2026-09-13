@@ -1,0 +1,16 @@
+{
+  "name": "questmine",
+  "version": "1.0.0",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "npm run dev --prefix backend",
+    "install:all": "npm install && npm install --prefix frontend && npm install --prefix backend",
+    "seed": "npm run seed --prefix backend"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}

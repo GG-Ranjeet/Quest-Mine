@@ -1,0 +1,126 @@
+/* brand / shared */
+.brand {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  font: 700 15px "Space Grotesk";
+  letter-spacing: 0.18em;
+  color: #f7f1e7;
+}
+.brand > span:last-child > span {
+  color: var(--gold);
+}
+.brand-mark {
+  color: var(--gold);
+  font-size: 21px;
+  filter: drop-shadow(0 0 9px rgba(215, 169, 94, 0.7));
+}
+.eyebrow,
+.breadcrumb,
+.location-pill,
+.event-card .eyebrow {
+  font: 500 10px "DM Mono";
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7e8a91;
+}
+.progress-track {
+  height: 5px;
+  border-radius: 8px;
+  background: #28333a;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #bd8445, #efd28a);
+  box-shadow: 0 0 14px rgba(226, 183, 98, 0.55);
+  transition: width 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.progress-track.xp {
+  width: 205px;
+  height: 4px;
+}
+.progress-track.xp .progress-fill {
+  background: linear-gradient(90deg, #9d6b3f, #d8af64);
+}
+.progress-track.boss {
+  height: 8px;
+  background: #2b2523;
+}
+.progress-track.boss .progress-fill {
+  background: linear-gradient(90deg, #ab5c43, #d48b63);
+  box-shadow: 0 0 16px rgba(212, 139, 99, 0.3);
+}
+.stone-panel {
+  background: linear-gradient(
+    145deg,
+    rgba(29, 40, 47, 0.98),
+    rgba(16, 23, 28, 0.98)
+  );
+  border: 1px solid var(--line);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.22),
+    inset 0 1px rgba(255, 255, 255, 0.025);
+}
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.section-head h2 {
+  margin: 6px 0 0;
+  font: 600 18px "Space Grotesk";
+  color: #f0e8da;
+}
+.text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  color: #d0a767;
+  font-size: 11px;
+}
+.outline-button,
+.soft-button,
+.round-action,
+.primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition:
+    transform 0.16s,
+    background 0.2s,
+    border-color 0.2s;
+}
+.outline-button {
+  padding: 10px 14px;
+  border: 1px solid rgba(215, 169, 94, 0.45);
+  color: #e6c985;
+  background: rgba(34, 27, 19, 0.22);
+  font-size: 12px;
+}
+.outline-button:hover {
+  background: rgba(215, 169, 94, 0.12);
+  border-color: var(--gold);
+}
+.primary-button {
+  padding: 14px 19px;
+  background: linear-gradient(100deg, #c08448, #e1b66e);
+  color: #1b1712;
+  font-weight: 800;
+  font-size: 12px;
+  box-shadow: 0 12px 25px rgba(193, 132, 72, 0.19);
+}
+.primary-button:hover,
+.complete-button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.07);
+}
+.primary-button:active,
+button:active {
+  transform: scale(0.97);
+}
