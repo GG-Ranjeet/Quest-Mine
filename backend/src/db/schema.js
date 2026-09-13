@@ -6,7 +6,7 @@ export const users = pgTable('users', {
     clerkId: varchar('clerk_id', { length: 255 }).unique(),
     name: varchar('name', { length: 100 }).notNull(),
     title: varchar('title', { length: 100 }),
-    level: integer('level').default(1),
+    level: integer('level').default(0),
     xp: integer('xp').default(0),
     coins: integer('coins').default(0),
 });

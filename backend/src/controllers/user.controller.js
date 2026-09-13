@@ -3,6 +3,29 @@ import { users, userInventories, items } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 import { Webhook } from 'svix';
 
+// GET /api/users — return all users (public leaderboard data)
+export const getAllUsers = async (req, res) => {
+  try {
+    const allUsers = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        title: users.title,
+        level: users.level,
+        xp: users.xp,
+        coins: users.coins,
+      })
+      .from(users)
+      .orderBy(users.xp);
+
+    res.json(allUsers);
+  } catch (error) {
+    console.error('Error fetching all users:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
 // Helper: extract clerk_id from the Bearer JWT without full verification
 // (Clerk's clerkMiddleware handles full JWT verification on protected routes)
 function getClerkIdFromReq(req) {

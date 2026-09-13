@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import express from 'express';
-import { getUserProfile } from '../controllers/user.controller.js';
+import { getUserProfile, getAllUsers } from '../controllers/user.controller.js';
 import { handleClerkWebhook } from '../controllers/user.controller.js';
 
 const router = Router();
 
 router.get('/', getUserProfile);
+router.get('/all', getAllUsers);
 
 export default router;
 

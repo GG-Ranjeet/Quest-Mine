@@ -23,6 +23,12 @@ export const api = {
     return res.json();
   },
 
+  async fetchAllUsers() {
+    const res = await fetch(`${API_BASE}/user/all`, { headers: await authHeaders() });
+    if (!res.ok) throw new Error('Failed to fetch users');
+    return res.json() as Promise<{ id: number; name: string; title: string | null; level: number; xp: number; coins: number }[]>;
+  },
+
   async fetchActiveQuests() {
     const res = await fetch(`${API_BASE}/quests`, { headers: await authHeaders() });
     if (!res.ok) throw new Error('Failed to fetch quests');
